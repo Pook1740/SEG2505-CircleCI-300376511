@@ -1,0 +1,9 @@
+
+---
+name: android unit tests
+discover: find app/src/test -type f -name '*Test.java'
+run: |
+  test_class="$(printf '%s' '<< test.atoms >>' | sed 's#^app/src/test/java/##; s#/#.#g; s#\.java$##')"
+  ./gradlew testDebugUnitTest --tests "$test_class" --no-daemon
+outputs:
+  junit: app/build/test-results/testDebugUnitTest
