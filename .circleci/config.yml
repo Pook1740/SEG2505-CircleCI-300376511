@@ -31,9 +31,9 @@ jobs:
             mv "$ANDROID_HOME/cmdline-tools/cmdline-tools" \
                "$ANDROID_HOME/cmdline-tools/latest"
 
-            echo 'export ANDROID_HOME=/home/circleci/android-sdk' >> "$BASH_ENV"
-            echo 'export ANDROID_SDK_ROOT=/home/circleci/android-sdk' >> "$BASH_ENV"
-            echo 'export PATH=/home/circleci/android-sdk/cmdline-tools/latest/bin:/home/circleci/android-sdk/platform-tools:$PATH' >> "$BASH_ENV"
+            echo "export ANDROID_HOME=$ANDROID_HOME" >> "$BASH_ENV"
+            echo "export ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT" >> "$BASH_ENV"
+            echo "export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:\$PATH" >> "$BASH_ENV"
 
             export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"
 
