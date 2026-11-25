@@ -37,7 +37,7 @@ jobs:
 
             export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"
 
-            yes | sdkmanager --sdk_root="$ANDROID_HOME" --licenses >/dev/null
+            yes | sdkmanager --sdk_root="$ANDROID_HOME" --licenses >/dev/null || true
             sdkmanager --sdk_root="$ANDROID_HOME" \
               "platform-tools" \
               "platforms;android-37"
