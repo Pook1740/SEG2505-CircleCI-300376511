@@ -1,0 +1,63 @@
+
+version: 2.1
+
+functions:
+  setup-java: github.com/circleci-functions/setup-java@v0.4.0
+
+jobs:
+  android:
+    docker:
+      - image: cimg/base:stable
+    environment:
+      ANDROID_HOME: /opt/android-sdk
+      ANDROID_SDK_ROOT: /opt/android-sdk
+    steps:
+      - checkout
+
+      - setup-java:
+          with:
+            distribution: temurin
+            java-version: "25"
+            cache-dependencies: gradle
+
+      - run:
+          name: Install Android SDK
+          command: |
+            mkdir -p "$ANDROID_HOME/cmdline-tools"
+            curl -fsSL \
+              https://dl.google.com/android/repository/commandlinetools-linux-13114758_latest.zip \
+              -o /tmp/android-tools.zip
+            unzip -q /tmp/android-tools.zip -d "$ANDROID_HOME/cmdline-tools"
+            mv "$ANDROID_HOME/cmdline-tools/cmdline-tools" \
+               "$ANDROID_HOME/cmdline-tools/latest"
+
+            echo 'export ANDROID_HOME=/opt/android-sdk' >> "$BASH_ENV"
+            echo 'export ANDROID_SDK_ROOT=/opt/android-sdk' >> "$BASH_ENV"
+            echo 'export PATH=/opt/android-sdk/cmdline-tools/latest/bin:/opt/android-sdk/platform-tools:$PATH' >> "$BASH_ENV"
+
+            export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"
+
+            yes | sdkmanager --sdk_root="$ANDROID_HOME" --licenses >/dev/null
+            sdkmanager --sdk_root="$ANDROID_HOME" \
+              "platform-tools" \
+              "platforms;android-37"
+
+      - run:
+          name: Build Android APK
+          command: ./gradlew assembleDebug --no-daemon
+
+      - run:
+          name: Run JUnit unit tests
+          command: circleci testsuite run "android unit tests"
+
+      - store_test_results:
+          path: app/build/test-results/testDebugUnitTest
+
+      - run:
+          name: Android lint
+          command: ./gradlew lint --no-daemon
+
+workflows:
+  build-and-test:
+    jobs:
+      - android
